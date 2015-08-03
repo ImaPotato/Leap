@@ -13,7 +13,7 @@ $(document).ready(function(){
 
     console.log('Added images to DOM');
 
-    //we're now safe to access the image array (it's also bad practice to have global variables...)
+    // start doing stuff
     var d = new draw();
 
   });
