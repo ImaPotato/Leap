@@ -27,7 +27,7 @@ var images = function(){
     	for (var i = 0; i < 5; i++){
       		//this is also really bad...
       		$('#imagepanel').append("<img id=img-" + i + " src='"+ imageArray[i].src + "' class='img-rounded' " + 
-        		" style='height:128px;border:1px solid #021a40;margin-left:10px; margin-top:10px;'>");
+        		" style='height:128px;margin-left:10px; margin-top:10px;'>");
     	}
 	};
 
