@@ -3,23 +3,23 @@ var loaders = [];
 
 var images = function(){
 
-	function loadSprite(src) {
+	function loadImage(src) {
 	    var deferred = $.Deferred();
-	    var sprite = new Image();
+	    var img = new Image();
 
-	    sprite.onload = function() {
-	    	imageArray.push(sprite);
+	    img.onload = function() {
+	    	imageArray.push(img);
 	        deferred.resolve();
 	    };
 
-	    sprite.src = src;
+	    img.src = src;
 
 	    return deferred.promise();
 	}
 
 	this.initialiseImages = function(){
 		for(var i = 1; i < 6; i++){
-			loaders.push(loadSprite('/image/' + i + '.png'));
+			loaders.push(loadImage('/image/' + i + '.png'));
 		}
 	};
 

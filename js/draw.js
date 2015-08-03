@@ -48,6 +48,11 @@ var draw = function(){
           switch (gesture.type){
             case "circle":
                 console.log("Circle Gesture");
+                //we will probably want to improve this as well
+                if(selectedImage != ''){
+                  increaseSize();
+                } 
+
                 break;
             case "keyTap":
                 console.log("Key Tap Gesture");
@@ -82,8 +87,6 @@ var draw = function(){
     $('img').each(function(){
       if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
         // won't work once we bring rotation into the mix but for now it'll do...
-        console.log(this);
-        console.log(this.id);
         selectedImage = this.id;
         $(this).css({"border-color": "#C1E0FF", 
                       "border-width":"1px", 
@@ -95,6 +98,11 @@ var draw = function(){
                       "border-style":"solid"});
       }
     });
+  }
+
+  function increaseSize(){
+    console.log('increasing');
+    $('#' + selectedImage).css({ "width": "+=" + $('#' + selectedImage).width() * .01, "height": "+=" + $('#' + selectedImage).height() * .01});
   }
 
   // listen to Leap Motion
