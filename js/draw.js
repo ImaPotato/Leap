@@ -50,7 +50,19 @@ var draw = function(){
                 console.log("Circle Gesture");
                 //we will probably want to improve this as well
                 if(selectedImage != ''){
-                  increaseSize();
+                  var clockwise = false;
+                  var pointableID = gesture.pointableIds[0];
+                  var direction = frame.pointable(pointableID).direction;
+                  var dotProduct = Leap.vec3.dot(direction, gesture.normal);
+
+                  if (dotProduct  >  0) clockwise = true;
+                  if (!clockwise) {
+                    increaseSize();
+                  }
+                  else
+                  {
+                    decreaseSize();
+                  }
                 } 
 
                 break;
@@ -88,8 +100,8 @@ var draw = function(){
       if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
         // won't work once we bring rotation into the mix but for now it'll do...
         selectedImage = this.id;
-        $(this).css({"border-color": "#C1E0FF", 
-                      "border-width":"1px", 
+        $(this).css({"border-color": "#67BCDB", 
+                      "border-width":"2px", 
                       "border-style":"solid"});
       } else {
         // we will need a better way of doing this as this will only work with one hand...
@@ -101,8 +113,10 @@ var draw = function(){
   }
 
   function increaseSize(){
-    console.log('increasing');
     $('#' + selectedImage).css({ "width": "+=" + $('#' + selectedImage).width() * .01, "height": "+=" + $('#' + selectedImage).height() * .01});
+  }
+  function decreaseSize(){
+    $('#' + selectedImage).css({ "width": "-=" + $('#' + selectedImage).width() * .01, "height": "-=" + $('#' + selectedImage).height() * .01});
   }
 
   // listen to Leap Motion
