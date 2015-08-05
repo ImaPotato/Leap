@@ -2,7 +2,7 @@
 
 You will want to be running a simple python server to use this
 
-depending on your version it will meen running 
+depending on your version it will mean running 
 
 python -m SimpleHTTPServer 3000
 
