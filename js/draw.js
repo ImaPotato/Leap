@@ -2,6 +2,10 @@ var draw = function(){
 
   var selectedImage = '';
 
+  function concatData(id, data) {
+      return id + ": " + data + "<br>";
+  }
+
   // renders each frame
   // docs on Frame - https://developer.leapmotion.com/documentation/javascript/api/Leap.Frame.html
   function draw(frame) {
@@ -35,10 +39,17 @@ var draw = function(){
         });
       }
 
+      if(hand[i].pinchStrength > 0.9){
+        if(selectedImage == '') onPicture(x, y);
+      } 
+
       if(frame.valid && frame.gestures.length > 0){
+
         frame.gestures.forEach(function(gesture){
+
           var handIds = gesture.handIds;
           handIds.forEach(function(handId){
+
             var hand = frame.hand(handId);
 
             //hand the gesture occured on
@@ -50,30 +61,22 @@ var draw = function(){
                 console.log("Circle Gesture");
                 //we will probably want to improve this as well
                 if(selectedImage != ''){
+
                   var clockwise = false;
                   var pointableID = gesture.pointableIds[0];
                   var direction = frame.pointable(pointableID).direction;
                   var dotProduct = Leap.vec3.dot(direction, gesture.normal);
 
                   if (dotProduct  >  0) clockwise = true;
-                  if (!clockwise) {
-                    increaseSize();
-                  }
-                  else
-                  {
-                    decreaseSize();
-                  }
+                  if (!clockwise) increaseSize(); else decreaseSize();
+
                 } 
 
                 break;
             case "keyTap":
                 console.log("Key Tap Gesture");
                 // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                if(selectedImage == ''){
-                  onPicture(x, y);
-                } else {
-                  selectedImage = '';
-                }
+                if(selectedImage != '') selectedImage = '';
                 break;
             case "screenTap":
                 console.log("Screen Tap Gesture");
@@ -87,11 +90,14 @@ var draw = function(){
     }
 
      //printing some data
-     var output = document.getElementById('output');
-     var frameString = "";
-     frameString += frame.hands.length;
-     frameString += "<br>"
-     output.innerHTML = "number of hands: "+ frameString;
+    var output = document.getElementById('output');
+    var frameString = concatData("frame_id", frame.id);
+    frameString += concatData("num_hands", frame.hands.length);
+    frameString += concatData("num_fingers", frame.fingers.length);
+    frameString += "<br>";
+
+    //$('#output').innerHtml(frameString);
+
   };
 
   function onPicture(x, y){
@@ -100,16 +106,16 @@ var draw = function(){
       if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
         // won't work once we bring rotation into the mix but for now it'll do...
         selectedImage = this.id;
-        $(this).css({"border-color": "#67BCDB", 
-                      "border-width":"2px", 
-                      "border-style":"solid"});
+        $(this).css({"border-color": "#67BCDB", "border-width":"2px", "border-style":"solid"});
       } else {
         // we will need a better way of doing this as this will only work with one hand...
-        $(this).css({"border-color": "#C1E0FF", 
-                      "border-width":"0px", 
-                      "border-style":"solid"});
+        $(this).css({"border-width":"0px"});
       }
     });
+  }
+
+  function checkForGesture(){
+
   }
 
   function increaseSize(){
