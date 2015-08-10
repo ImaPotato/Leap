@@ -5,3 +5,17 @@
   height:30px;
   border-radius:50px;
 }
+
+.header{
+	margin-top: 0px;
+	padding: 0px;
+	background-color: #67BCDB;
+	height : 50px;
+}
+
+.header h3{
+	margin-top: 0px;
+	padding: 0px;
+	color: #FFFFFF;
+	text-align:right;
+}
