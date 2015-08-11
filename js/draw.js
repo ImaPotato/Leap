@@ -1,7 +1,6 @@
 var draw = function(){
 
   var selectedImage = '';
-  var mode = 1; //1 is regular and -1 is edit mode
 
 var x;
 var y;
@@ -20,6 +19,7 @@ var y;
     
       var finger = hand[i].fingers[1]; //index finger
       var pos = finger.dipPosition;
+      var palmNorm = hand[i].roll();
 
       // create a circle for the finger
       var radius = 50;
@@ -39,8 +39,8 @@ var y;
         "left": x + "px",
       });
 
-      // if we've selected an image and we're in moving mode move it to its new position
-      if(selectedImage != '' && mode == 1){
+      // if we've selected an image move it to its new position
+      if(selectedImage != ''){
         $('#' + selectedImage).css({
           "position": "absolute", 
           "top": y + "px",
@@ -48,9 +48,13 @@ var y;
         });
       }
 
-      if(hand[i].pinchStrength > 0.85){
+      if(hand[i].pinchStrength == 1){
         if(selectedImage == '') onPicture(x, y);
       } 
+
+      if(selectedImage != ''){
+        if (palmNorm > 0.43) decreaseSize(); else if (palmNorm < -0.43) increaseSize();
+      }
 
       if(frame.valid && frame.gestures.length > 0){
 
@@ -64,13 +68,12 @@ var y;
             //hand the gesture occured on
 
           });
-          var m = mode==1 ? "moving mode  " : "edit mode  ";
           switch (gesture.type){
             case "circle":
                 console.log("Circle Gesture");
-                document.getElementById("output").innerHTML = m+ " circle gesture "+ selectedImage;
-                //if we're in edit mode -rotate
-                if(selectedImage != '' && mode == -1){
+                document.getElementById("output").innerHTML = "circle gesture "+ selectedImage;
+                //rotate
+                if(selectedImage != ''){
 
                   var clockwise = false;
                   var pointableID = gesture.pointableIds[0];
@@ -84,41 +87,45 @@ var y;
                 break;
             case "keyTap":
                 console.log("Key Tap Gesture");
-                document.getElementById("output").innerHTML = m + " keytap gesture";
+                document.getElementById("output").innerHTML = "keytap gesture";
                 // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
                 if(selectedImage != '') selectedImage = '';
                 break;
             case "screenTap":
-            //tying screenTap to mode change because swipe is awful
+
                 console.log("Screen Tap Gesture");
-                document.getElementById("output").innerHTML = m+" screenTap gesture";
-                //edit mode
-                mode = mode *-1;
+                document.getElementById("output").innerHTML = "screenTap gesture";
                 break;
             case "swipe":
                 console.log("Swipe Gesture");
-                document.getElementById("output").innerHTML = m+" swipe gesture";
-                //edit mode
-                mode = mode *-1;
+                document.getElementById("output").innerHTML = "swipe gesture";
                 break;
             }
 
 
         });
         //both hands on screen and edit mode
-            if(frame.hands.length==2 && selectedImage != '' && mode==-1){
-             document.getElementById("output").innerHTML = " scaling "+ selectedImage;
+            // if(frame.hands.length==2 && selectedImage != '' && mode==-1){
+            //  document.getElementById("output").innerHTML = " scaling "+ selectedImage;
 
-              //scaling
-              var x1 = hand[0].fingers[1].dipPosition[0];
-              var y1 = hand[0].fingers[1].dipPosition[1];
+            //   //scaling
+            //   var x1 = hand[0].fingers[1].dipPosition[0];
+            //   var y1 = hand[0].fingers[1].dipPosition[1];
 
-              var x2 = hand[1].fingers[1].dipPosition[0];
-              var y2 = hand[1].fingers[1].dipPosition[1];
+            //   var x2 = hand[1].fingers[1].dipPosition[0];
+            //   var y2 = hand[1].fingers[1].dipPosition[1];
                 
-              var dist = Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );  
-              if (dist> 100) increaseSize(); else decreaseSize();
-            }
+            //   var dist = Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );  
+            //   if (dist> 100) increaseSize(); else decreaseSize();
+            // }
+
+            // float roll = hand[i].palmNormal().roll();
+            // document.getElementById("output").innerHTML = "roll: " + roll;
+
+
+            //float roll = hand.PalmNormal.Roll;
+
+
       }
     } 
          

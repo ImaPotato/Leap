@@ -19,7 +19,7 @@ var images = function(){
 
 	this.initialiseImages = function(){
 		for(var i = 1; i < 8; i++){
-			loaders.push(loadImage('/image/' + i + '.png'));
+			loaders.push(loadImage('image/' + i + '.png'));
 		}
 	};
 
