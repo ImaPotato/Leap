@@ -9,13 +9,13 @@
 .header{
 	margin-top: 0px;
 	padding: 0px;
-	background-color: #67BCDB;
+	background-color: #E6E6E6;
 	height : 50px;
 }
 
 .header h3{
 	margin-top: 0px;
 	padding: 0px;
-	color: #FFFFFF;
+	color: #000000;
 	text-align:right;
 }

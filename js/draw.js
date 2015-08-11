@@ -53,7 +53,7 @@ var draw = function(){
 
       //select an image if user pinches on an image (and there is no image currently selected)
       if(hand[i].pinchStrength > 0.9){
-        if(selectedImage == '') onPicture(x, y);
+        if(selectedImage == '') onPicture(x, y); recolour("select");
       } 
 
       //scale image if palm normal is 
@@ -83,8 +83,8 @@ var draw = function(){
                   canDrop = false;
                   clearTimeout(moveReset);
                   clearTimeout(dropReset);
-                  dropReset = setTimeout(function(){canDrop = true},300);
-                  moveReset = setTimeout(function(){canMove = true},600);
+                  dropReset = setTimeout(function(){canDrop = true},400);
+                  moveReset = setTimeout(function(){canMove = true},1000);
 
                   var clockwise = false;
                   var pointableID = gesture.pointableIds[0];
@@ -101,7 +101,7 @@ var draw = function(){
                 console.log("Key Tap Gesture");
                 document.getElementById("output").innerHTML = "keytap gesture";
                 // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                if(selectedImage != '' && canDrop == true) selectedImage = '';
+                if(selectedImage != '' && canDrop == true) selectedImage = ''; recolour("unselect");
                 break;
             case "screenTap":
 
@@ -117,14 +117,13 @@ var draw = function(){
       }
     }     
 
-     //printing some data
+    //printing some data
     var output = document.getElementById('output');
     var frameString = concatData("frame_id", frame.id);
     frameString += concatData("num_hands", frame.hands.length);
     frameString += concatData("num_fingers", frame.fingers.length);
     frameString += "<br>";
 
-    //$('#output').innerHtml(frameString);
 
   };
 
@@ -153,16 +152,32 @@ var draw = function(){
     $('#' + selectedImage).css({ "width": "-=" + $('#' + selectedImage).width() * .01, "height": "-=" + $('#' + selectedImage).height() * .01});
   }
 
+  //rotate image anti-clockwise
   function rotateACW(){
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
     img.rotate(angle -0.5);
   }
 
+  //rotate image clockwise
   function rotateCW(){
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
     img.rotate(angle -359.5);
+  }
+
+  //recolour the header depending on the event
+  function recolour(event){
+    switch(event){
+      case "select":
+        $(".header").css("background-color", "#0099FF");
+        break;
+
+      case "unselect":
+        $(".header").css("background-color", "#E6E6E6");
+        break;
+    }
+
   }
 
   // listen to Leap Motion
