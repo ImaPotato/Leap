@@ -2,8 +2,8 @@ var draw = function(){
 
   var selectedImage = '';
 
-var x;
-var y;
+  var x;
+  var y;
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -17,20 +17,17 @@ var y;
 
     for (var i = 0; i < hand.length; i++) { //for each of the hands
     
+      var radius = 50; // create a circle for the finger
+      var palmNormalInertia = 0.43; //value at which to register a hand roll movement to scale an image
+
       var finger = hand[i].fingers[1]; //index finger
       var pos = finger.dipPosition;
-      var palmNorm = hand[i].roll();
+      var palmNorm = hand[i].roll(); //palm normal value
 
-      // create a circle for the finger
-      var radius = 50;
 
-    //previous x, y
-    // var x = pos[0]*5;
-    //var y = $(window).height() - pos[1]*3.5;
-
-    //hand directly above Leap should be in middle of screen
-    x = $(window).width()/2 + pos[0]*6 ;
-    y = $(window).height() - pos[1]*3;
+      //hand directly above Leap should be in middle of screen
+      x = $(window).width()/2 + pos[0]*6 ;
+      y = $(window).height() - pos[1]*3;
 
       //  update the cursor
       $("#hand" + i).css({
@@ -48,26 +45,27 @@ var y;
         });
       }
 
-      if(hand[i].pinchStrength == 1){
+      //select an image if user pinches on an image (and there is no image currently selected)
+      if(hand[i].pinchStrength > 0.9){
         if(selectedImage == '') onPicture(x, y);
       } 
 
+      //scale image if palm normal is 
       if(selectedImage != ''){
-        if (palmNorm > 0.43) decreaseSize(); else if (palmNorm < -0.43) increaseSize();
+        if (palmNorm > palmNormalInertia) decreaseSize(); 
+        else if (palmNorm < -palmNormalInertia) increaseSize();
       }
 
+      //If a gesture has been made by the user
       if(frame.valid && frame.gestures.length > 0){
 
         frame.gestures.forEach(function(gesture){
 
           var handIds = gesture.handIds;
           handIds.forEach(function(handId){
-
-            var hand = frame.hand(handId);
-
-            //hand the gesture occured on
-
+            var hand = frame.hand(handId); //hand the gesture occured on        
           });
+
           switch (gesture.type){
             case "circle":
                 console.log("Circle Gesture");
@@ -100,35 +98,10 @@ var y;
                 console.log("Swipe Gesture");
                 document.getElementById("output").innerHTML = "swipe gesture";
                 break;
-            }
-
-
+          }
         });
-        //both hands on screen and edit mode
-            // if(frame.hands.length==2 && selectedImage != '' && mode==-1){
-            //  document.getElementById("output").innerHTML = " scaling "+ selectedImage;
-
-            //   //scaling
-            //   var x1 = hand[0].fingers[1].dipPosition[0];
-            //   var y1 = hand[0].fingers[1].dipPosition[1];
-
-            //   var x2 = hand[1].fingers[1].dipPosition[0];
-            //   var y2 = hand[1].fingers[1].dipPosition[1];
-                
-            //   var dist = Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );  
-            //   if (dist> 100) increaseSize(); else decreaseSize();
-            // }
-
-            // float roll = hand[i].palmNormal().roll();
-            // document.getElementById("output").innerHTML = "roll: " + roll;
-
-
-            //float roll = hand.PalmNormal.Roll;
-
-
       }
-    } 
-         
+    }     
 
      //printing some data
     var output = document.getElementById('output');
