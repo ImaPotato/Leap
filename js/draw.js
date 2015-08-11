@@ -4,6 +4,10 @@ var draw = function(){
 
   var x;
   var y;
+  var canMove = true; //true if selected image is able to move
+  var canDrop = true; //true if selected image is able to be dropped
+  var moveReset; //reset timer for moving image after rotating
+  var dropReset; //reset timer for dropping image after rotating
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -19,10 +23,12 @@ var draw = function(){
     
       var radius = 50; // create a circle for the finger
       var palmNormalInertia = 0.43; //value at which to register a hand roll movement to scale an image
+      
 
       var finger = hand[i].fingers[1]; //index finger
       var pos = finger.dipPosition;
       var palmNorm = hand[i].roll(); //palm normal value
+
 
 
       //hand directly above Leap should be in middle of screen
@@ -37,7 +43,7 @@ var draw = function(){
       });
 
       // if we've selected an image move it to its new position
-      if(selectedImage != ''){
+      if(selectedImage != '' && canMove == true){
         $('#' + selectedImage).css({
           "position": "absolute", 
           "top": y + "px",
@@ -71,7 +77,14 @@ var draw = function(){
                 console.log("Circle Gesture");
                 document.getElementById("output").innerHTML = "circle gesture "+ selectedImage;
                 //rotate
+                
                 if(selectedImage != ''){
+                  canMove = false;
+                  canDrop = false;
+                  clearTimeout(moveReset);
+                  clearTimeout(dropReset);
+                  dropReset = setTimeout(function(){canDrop = true},300);
+                  moveReset = setTimeout(function(){canMove = true},600);
 
                   var clockwise = false;
                   var pointableID = gesture.pointableIds[0];
@@ -81,13 +94,14 @@ var draw = function(){
                   if (dotProduct  >  0) clockwise = true;
                   if (!clockwise) rotateACW(); else rotateCW();
 
+
                 }
                 break;
             case "keyTap":
                 console.log("Key Tap Gesture");
                 document.getElementById("output").innerHTML = "keytap gesture";
                 // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                if(selectedImage != '') selectedImage = '';
+                if(selectedImage != '' && canDrop == true) selectedImage = '';
                 break;
             case "screenTap":
 
