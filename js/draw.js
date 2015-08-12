@@ -8,6 +8,7 @@ var draw = function(){
   var canDrop = true; //true if selected image is able to be dropped
   var moveReset; //reset timer for moving image after rotating
   var dropReset; //reset timer for dropping image after rotating
+  var currentZ = -1;
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -29,7 +30,7 @@ var draw = function(){
       var pos = finger.dipPosition;
       var palmNorm = hand[i].roll(); //palm normal value
 
-
+      console.log(hand[i].pitch());
 
       //hand directly above Leap should be in middle of screen
       x = $(window).width()/2 + pos[0]*6 ;
@@ -53,7 +54,10 @@ var draw = function(){
 
       //select an image if user pinches on an image (and there is no image currently selected)
       if(hand[i].pinchStrength > 0.9){
-        if(selectedImage == '') onPicture(x, y); recolour("select");
+        if(selectedImage == ''){
+          onPicture(x, y); 
+          recolour("select");
+        } 
       } 
 
       //scale image if palm normal is 
@@ -101,12 +105,27 @@ var draw = function(){
                 console.log("Key Tap Gesture");
                 document.getElementById("output").innerHTML = "keytap gesture";
                 // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                if(selectedImage != '' && canDrop == true) selectedImage = ''; recolour("unselect");
+                if(selectedImage != '' && canDrop == true) {
+                  selectedImage = ''; 
+                  recolour("unselect");
+                }
                 break;
             case "screenTap":
-
                 console.log("Screen Tap Gesture");
                 document.getElementById("output").innerHTML = "screenTap gesture";
+                
+                if(selectedImage != '' && canMove == true){
+                  // var currentZ = ($('#' + selectedImage).css("z-index")) - 1;
+                  // var zString - currentZ.toString();
+                  $('#' + selectedImage).css({
+                    "z-index": currentZ.toString()
+                  }); 
+                  currentZ--; 
+                }
+
+                
+
+                
                 break;
             case "swipe":
                 console.log("Swipe Gesture");
