@@ -6,9 +6,12 @@ var draw = function(){
   var y;
   var canMove = true; //true if selected image is able to move
   var canDrop = true; //true if selected image is able to be dropped
+  var canMoveZ = false; //true when selected image can move forward or backward along z axis
   var moveReset; //reset timer for moving image after rotating
   var dropReset; //reset timer for dropping image after rotating
+  var depthReset; //reset timer for adjusting z-index of selected image
   var currentZ = -1;
+  var zDelayStarted = false;
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -24,13 +27,16 @@ var draw = function(){
     
       var radius = 50; // create a circle for the finger
       var palmNormalInertia = 0.43; //value at which to register a hand roll movement to scale an image
-      
+      var palmPitchInertia = 0.66;
 
       var finger = hand[i].fingers[1]; //index finger
       var pos = finger.dipPosition;
-      var palmNorm = hand[i].roll(); //palm normal value
+      var palmNorm = hand[i].roll(); //palm roll normal value
+      var palmPitch = hand[i].pitch(); //palm pitch normal value
 
-      console.log(hand[i].pitch());
+
+      //TESTING HAND PITCH TESTING HAND PITCH
+      //console.log(hand[i].pitch());
 
       //hand directly above Leap should be in middle of screen
       x = $(window).width()/2 + pos[0]*6 ;
@@ -60,10 +66,38 @@ var draw = function(){
         } 
       } 
 
-      //scale image if palm normal is 
+      //scale selected image depending on palm roll
       if(selectedImage != ''){
         if (palmNorm > palmNormalInertia) decreaseSize(); 
         else if (palmNorm < -palmNormalInertia) increaseSize();
+      }
+
+      //adjust z-index of selected image depending on palm pitch
+      if(selectedImage != ''){
+        if(palmPitch > palmPitchInertia){
+          if(!zDelayStarted){
+            zDelayStarted = true
+            depthReset = setTimeout(function(){canMoveZ = true},2000);
+          }
+          if(canMoveZ){
+            moveBack();
+          } 
+
+        }   
+        else if (palmPitch < -palmPitchInertia){
+          if(!zDelayStarted){
+            zDelayStarted = true
+            depthReset = setTimeout(function(){canMoveZ = true},2000);
+          }
+          if(canMoveZ){
+            moveForward();
+          }
+            
+        }
+        else{
+          clearTimeout(depthReset);
+          zDelayStarted = false;
+        }
       }
 
       //If a gesture has been made by the user
@@ -112,20 +146,7 @@ var draw = function(){
                 break;
             case "screenTap":
                 console.log("Screen Tap Gesture");
-                document.getElementById("output").innerHTML = "screenTap gesture";
-                
-                if(selectedImage != '' && canMove == true){
-                  // var currentZ = ($('#' + selectedImage).css("z-index")) - 1;
-                  // var zString - currentZ.toString();
-                  $('#' + selectedImage).css({
-                    "z-index": currentZ.toString()
-                  }); 
-                  currentZ--; 
-                }
-
-                
-
-                
+                document.getElementById("output").innerHTML = "screenTap gesture";                         
                 break;
             case "swipe":
                 console.log("Swipe Gesture");
@@ -183,6 +204,26 @@ var draw = function(){
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
     img.rotate(angle -359.5);
+  }
+
+  function moveBack(){
+    var initialZ = $('#' + selectedImage).css("z-index");
+    $('#' + selectedImage).css({
+      "z-index": (parseInt(initialZ) - 1).toString()
+    }); 
+    console.log("Image moved back. InitialZ: " + initialZ + " and new z: " + (parseInt(initialZ) -1).toString());
+    canMoveZ = false;
+    zDelayStarted = false;
+  }
+
+  function moveForward(){
+    var initialZ = $('#' + selectedImage).css("z-index");
+    $('#' + selectedImage).css({
+      "z-index": (parseInt(initialZ) + 1).toString()
+    }); 
+    console.log("Image moved forward. InitialZ: " + initialZ + " and new z: " + (parseInt(initialZ) + 1).toString());
+    canMoveZ = false;
+    zDelayStarted = false;
   }
 
   //recolour the header depending on the event

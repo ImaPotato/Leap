@@ -13,6 +13,7 @@ var images = function(){
 	    };
 
 	    img.src = src;
+	    img.style.zIndex = "1";
 
 	    return deferred.promise();
 	}
@@ -27,7 +28,7 @@ var images = function(){
     	for (var i = 0; i < 7; i++){
       		//this is also really bad...
       		$('#imagepanel').append("<img id=img-" + i + " src='"+ imageArray[i].src + "' class='img-rounded' " + 
-        		" style='height:128px;margin-left:10px; margin-top:10px;'>");
+        		" style='height:128px;margin-left:10px; margin-top:10px; z-index:1'>");
     	}
 	};
 
