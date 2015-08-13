@@ -10,8 +10,7 @@ var draw = function(){
   var moveReset; //reset timer for moving image after rotating
   var dropReset; //reset timer for dropping image after rotating
   var depthReset; //reset timer for adjusting z-index of selected image
-  var currentZ = -1;
-  var zDelayStarted = false;
+  var zDelayStarted = false; //If a delay for adjusting z-index is currently in progress or not
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -91,8 +90,7 @@ var draw = function(){
           }
           if(canMoveZ){
             moveForward();
-          }
-            
+          }     
         }
         else{
           clearTimeout(depthReset);
