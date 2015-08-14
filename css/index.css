@@ -19,3 +19,32 @@
 	color: #000000;
 	text-align:right;
 }
+
+.left {
+    width: 200px;
+    height: 90vh;
+    float: left;
+    border-right: 2px #E6E6E6 solid;
+    overflow-y: scroll;
+}
+
+.left div{
+	min-width: 150px;
+	text-align: center;
+    vertical-align: middle;
+}
+
+.left div img{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.unmoveable{
+
+}
+
+.right {
+    white-space:nowrap;
+    overflow:hidden;
+    text-align: right;
+}

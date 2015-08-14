@@ -27,8 +27,11 @@ var images = function(){
 	this.addImages = function(){
     	for (var i = 0; i < 7; i++){
       		//this is also really bad...
-      		$('#imagepanel').append("<img id=img-" + i + " src='"+ imageArray[i].src + "' class='img-rounded' " + 
-        		" style='height:128px;margin-left:10px; margin-top:10px; z-index:1'>");
+      		$('#panel').append(
+      			"<div>" +
+      				"<img id=img-" + i + " src='"+ imageArray[i].src + "' class='img-rounded unmoveable' style='height:128px;z-index:1'> " + 
+      				"<hr>" +
+      			"</div>");
     	}
 	};
 

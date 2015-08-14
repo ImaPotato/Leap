@@ -7,10 +7,16 @@ var draw = function(){
   var canMove = true; //true if selected image is able to move
   var canDrop = true; //true if selected image is able to be dropped
   var canMoveZ = false; //true when selected image can move forward or backward along z axis
+  var canPinch = true;
+
   var moveReset; //reset timer for moving image after rotating
   var dropReset; //reset timer for dropping image after rotating
   var depthReset; //reset timer for adjusting z-index of selected image
+  var pinchReset; //reset timer for selecting and deslecting images
+
   var zDelayStarted = false; //If a delay for adjusting z-index is currently in progress or not
+
+  var selectImages = [];
 
   function concatData(id, data) {
       return id + ": " + data + "<br>";
@@ -48,110 +54,203 @@ var draw = function(){
         "left": x + "px",
       });
 
-      // if we've selected an image move it to its new position
-      if(selectedImage != '' && canMove == true){
-        $('#' + selectedImage).css({
-          "position": "absolute", 
-          "top": y + "px",
-          "left": x + "px",
-        });
-      }
+      // lets do something really gross, if the x position of the cursor is less then 200px, we can assume that it's over the side panel 
+      if(x < 200){
 
-      //select an image if user pinches on an image (and there is no image currently selected)
-      if(hand[i].pinchStrength > 0.9){
-        if(selectedImage == ''){
-          onPicture(x, y); 
-          recolour("select");
+        // check if they're currently holding a picture, if they are place it
+
+        // see if they've attempted to select anything
+
+        if(hand[i].pinchStrength > 0.9){
+
+          var id = onPicturePanel(x, y); 
+
+          if(id != '' && canPinch){
+
+            canPinch = false;
+            pinchReset = setTimeout(function(){canPinch = true}, 500);
+
+            var index = -1;
+
+            for (var z = 0; z < selectImages.length; z++){
+              if(selectImages[z] == id){
+                index = z;
+              }
+            } 
+
+            if (index != -1){
+              selectImages.splice(index, z);
+            } else {
+              selectImages.push(id);
+            }
+
+            $('.unmoveable').each(function(){
+
+              var contains = false;
+
+              for (var z = 0; z < selectImages.length; z ++){
+                if (selectImages[z] == this.id){
+                  contains = true;
+                }
+              }
+
+              if (contains){
+                $(this).css({"border-color": "#67BCDB", "border-width":"2px", "border-style":"solid"});
+              } else {
+                $(this).css({"border-width":"0px"});
+              }
+
+
+            });
+
+          }
         } 
-      } 
 
-      //scale selected image depending on palm roll
-      if(selectedImage != ''){
-        if (palmNorm > palmNormalInertia) decreaseSize(); 
-        else if (palmNorm < -palmNormalInertia) increaseSize();
-      }
+        // if they palm down move scroll bar down, the opposite if they palm up
+        if (palmNorm > palmNormalInertia){
 
-      //adjust z-index of selected image depending on palm pitch
-      if(selectedImage != ''){
-        if(palmPitch > palmPitchInertia){
-          if(!zDelayStarted){
-            zDelayStarted = true
-            depthReset = setTimeout(function(){canMoveZ = true},2000);
-          }
-          if(canMoveZ){
-            moveBack();
-          } 
+        } 
+        else if (palmNorm < -palmNormalInertia){
 
-        }   
-        else if (palmPitch < -palmPitchInertia){
-          if(!zDelayStarted){
-            zDelayStarted = true
-            depthReset = setTimeout(function(){canMoveZ = true},2000);
-          }
-          if(canMoveZ){
-            moveForward();
-          }     
         }
-        else{
-          clearTimeout(depthReset);
-          zDelayStarted = false;
-        }
-      }
 
-      //If a gesture has been made by the user
-      if(frame.valid && frame.gestures.length > 0){
+        // if they swipe right move all images onto the screen
+        if(frame.valid && frame.gestures.length > 0){
 
-        frame.gestures.forEach(function(gesture){
+          frame.gestures.forEach(function(gesture){
 
-          var handIds = gesture.handIds;
-          handIds.forEach(function(handId){
-            var hand = frame.hand(handId); //hand the gesture occured on        
+            var handIds = gesture.handIds;
+            handIds.forEach(function(handId){
+              var hand = frame.hand(handId); //hand the gesture occured on        
+            });
+
+            switch (gesture.type){
+              case "swipe":
+                  if (selectImages.length != 0){
+
+                    for(var i = 0; i < selectImages.length; i++){
+                      $("#img-"selectImages[i]);
+                    }
+
+                    //deselect everything
+                    selectImages = [];
+                    $('.unmoveable').each(function(){
+                      $(this).css({"border-width":"0px"});
+                    });
+
+                  }
+                  console.log("Swipe Gesture");
+                  document.getElementById("output").innerHTML = "swipe gesture";
+                  break;
+            }
           });
+        }
 
-          switch (gesture.type){
-            case "circle":
-                console.log("Circle Gesture");
-                document.getElementById("output").innerHTML = "circle gesture "+ selectedImage;
-                //rotate
-                
-                if(selectedImage != ''){
-                  canMove = false;
-                  canDrop = false;
-                  clearTimeout(moveReset);
-                  clearTimeout(dropReset);
-                  dropReset = setTimeout(function(){canDrop = true},400);
-                  moveReset = setTimeout(function(){canMove = true},1000);
+      } else {
 
-                  var clockwise = false;
-                  var pointableID = gesture.pointableIds[0];
-                  var direction = frame.pointable(pointableID).direction;
-                  var dotProduct = Leap.vec3.dot(direction, gesture.normal);
+        // if we've selected an image move it to its new position
+        if(selectedImage != '' && canMove == true){
+          $('#' + selectedImage).css({
+            "position": "absolute", 
+            "top": y + "px",
+            "left": x + "px",
+          });
+        }
 
-                  if (dotProduct  >  0) clockwise = true;
-                  if (!clockwise) rotateACW(); else rotateCW();
+        //select an image if user pinches on an image (and there is no image currently selected)
+        if(hand[i].pinchStrength > 0.9){
+          if(selectedImage == ''){
+            onPicture(x, y); 
+            recolour("select");
+          } 
+        } 
 
+        //scale selected image depending on palm roll
+        if(selectedImage != ''){
+          if (palmNorm > palmNormalInertia) decreaseSize(); 
+          else if (palmNorm < -palmNormalInertia) increaseSize();
+        }
 
-                }
-                break;
-            case "keyTap":
-                console.log("Key Tap Gesture");
-                document.getElementById("output").innerHTML = "keytap gesture";
-                // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                if(selectedImage != '' && canDrop == true) {
-                  selectedImage = ''; 
-                  recolour("unselect");
-                }
-                break;
-            case "screenTap":
-                console.log("Screen Tap Gesture");
-                document.getElementById("output").innerHTML = "screenTap gesture";                         
-                break;
-            case "swipe":
-                console.log("Swipe Gesture");
-                document.getElementById("output").innerHTML = "swipe gesture";
-                break;
+        //adjust z-index of selected image depending on palm pitch
+        if(selectedImage != ''){
+          if(palmPitch > palmPitchInertia){
+            if(!zDelayStarted){
+              zDelayStarted = true
+              depthReset = setTimeout(function(){canMoveZ = true},2000);
+            }
+            if(canMoveZ){
+              moveBack();
+            } 
+
+          }   
+          else if (palmPitch < -palmPitchInertia){
+            if(!zDelayStarted){
+              zDelayStarted = true
+              depthReset = setTimeout(function(){canMoveZ = true},2000);
+            }
+            if(canMoveZ){
+              moveForward();
+            }     
           }
-        });
+          else{
+            clearTimeout(depthReset);
+            zDelayStarted = false;
+          }
+        }
+
+        //If a gesture has been made by the user
+        if(frame.valid && frame.gestures.length > 0){
+
+          frame.gestures.forEach(function(gesture){
+
+            var handIds = gesture.handIds;
+            handIds.forEach(function(handId){
+              var hand = frame.hand(handId); //hand the gesture occured on        
+            });
+
+            switch (gesture.type){
+              case "circle":
+                  console.log("Circle Gesture");
+                  document.getElementById("output").innerHTML = "circle gesture "+ selectedImage;
+                  //rotate
+                  
+                  if(selectedImage != ''){
+                    canMove = false;
+                    canDrop = false;
+                    clearTimeout(moveReset);
+                    clearTimeout(dropReset);
+                    dropReset = setTimeout(function(){canDrop = true},400);
+                    moveReset = setTimeout(function(){canMove = true},1000);
+
+                    var clockwise = false;
+                    var pointableID = gesture.pointableIds[0];
+                    var direction = frame.pointable(pointableID).direction;
+                    var dotProduct = Leap.vec3.dot(direction, gesture.normal);
+
+                    if (dotProduct  >  0) clockwise = true;
+                    if (!clockwise) rotateACW(); else rotateCW();
+                  }
+                  break;
+              case "keyTap":
+                  console.log("Key Tap Gesture");
+                  document.getElementById("output").innerHTML = "keytap gesture";
+                  // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
+                  if(selectedImage != '' && canDrop == true) {
+                    selectedImage = ''; 
+                    recolour("unselect");
+                  }
+                  break;
+              case "screenTap":
+                  console.log("Screen Tap Gesture");
+                  document.getElementById("output").innerHTML = "screenTap gesture";                         
+                  break;
+              case "swipe":
+                  console.log("Swipe Gesture");
+                  document.getElementById("output").innerHTML = "swipe gesture";
+                  break;
+            }
+          });
+        }
       }
     }     
 
@@ -167,7 +266,7 @@ var draw = function(){
 
   function onPicture(x, y){
   //check if on cat picture
-    $('img').each(function(){
+    $('img:not(.unmoveable)').each(function(){
       if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
         // won't work once we bring rotation into the mix but for now it'll do...
         selectedImage = this.id;
@@ -179,8 +278,16 @@ var draw = function(){
     });
   }
 
-  function checkForGesture(){
-
+  function onPicturePanel(x, y){
+  //check if on cat picture
+    var img = '';
+    $('.unmoveable').each(function(){
+      if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
+        // won't work once we bring rotation into the mix but for now it'll do...
+        img = this.id;
+      }
+    });
+    return img;
   }
 
   function increaseSize(){
@@ -194,14 +301,14 @@ var draw = function(){
   function rotateACW(){
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
-    img.rotate(angle -0.5);
+    img.rotate(angle -0.2);
   }
 
   //rotate image clockwise
   function rotateCW(){
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
-    img.rotate(angle -359.5);
+    img.rotate(angle -359.8);
   }
 
   function moveBack(){
