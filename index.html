@@ -14,12 +14,40 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="css/index.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
   </head>
 
   <body>
     <div class = "header">
         <h3 id="output"></h3>
+        <div class="pull-left instructions">instructions   <span class ="glyphicon glyphicon-question-sign"></span></div>
     </div>
+
+<div class = "instructions-panel">
+               <h2>GESTURES</h2>
+            <div class = "row">
+                <div class = "col-sm-4"><img src="assets/pinch.png"></div>
+                <div class = "col-sm-4"><img src="assets/swipe.png"></div>
+                <div class = "col-sm-4"><img src="assets/circle.png"></div>
+            </div>
+            <div class = "row">
+                <div class = "col-sm-4">Selection - Pinch</div>
+                <div class = "col-sm-4">Edit - Swipe</div>
+                <div class = "col-sm-4">Rotation - Circle</div>
+  
+            </div>
+            <div class = "row">
+                <div class = "col-sm-4"><img src="assets/keytap.png"></div>
+                <div class = "col-sm-4"><img src="assets/roll.png"></div>
+                <div class = "col-sm-4"><img src="assets/pitch.png"></div>
+            </div>
+            <div class = "row">
+                <div class = "col-sm-4"> Deselection - KeyTap</div>
+                <div class = "col-sm-4"> Scaling - Roll</div>
+                <div class = "col-sm-4"> Depth - Pitch</div>
+            </div>
+            </div>
+
     <div>
         <!-- these will be the users hands -->
         <div id="panel" class="left">
@@ -35,7 +63,11 @@
             <div id="imagepanel"></div>
         </div>
     </div>
-
+<script type="text/javascript">
+$(".instructions").click(function(){
+$(".instructions-panel").fadeToggle();
+});
+</script>
     <script src="js/jqueryrotate.js"></script>
 
     <script src="js/image.js"></script>

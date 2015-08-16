@@ -48,3 +48,30 @@
     overflow:hidden;
     text-align: right;
 }
+.header .instructions{
+  text-align:center;
+  margin-top: 10px;
+  margin-left: 20px;
+  min-height: 30px;
+  min-width: 70px;
+  color:#000000;
+  font-size: 20px;
+}
+
+.instructions-panel{
+  background-color: #67BCDB;
+  font-family: 'Raleway';
+  font-size: 20px;
+  text-align: center;
+  color:#FFFFFF;
+  left:30%;
+  width: 40%;
+  display: none;
+  position: fixed;
+}
+
+.instructions-panel h2{
+
+  font-size: 30px;
+  text-align: center;
+}
