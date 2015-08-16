@@ -77,3 +77,8 @@
   font-size: 30px;
   text-align: center;
 }
+
+#output{
+  margin-right: 5px;
+  margin-top: 5px;
+}

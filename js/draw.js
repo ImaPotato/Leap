@@ -149,17 +149,18 @@ var draw = function(){
         //select an image if user pinches on an image (and there is no image currently selected)
         if(hand[i].pinchStrength > 0.9){
           if(selectedImage == ''){
-            onPicture(x, y); 
-            recolour("select");
+            if(onPicture(x, y)){
+              recolour("select");
+            }       
           } 
         } 
 
-        if (palmNorm > palmNormalInertia){
+        if (palmNorm > palmNormalInertia && selectedImage != ''){
           recolour("scale"); 
           decreaseSize();
           scaling = true;
         }  
-        else if (palmNorm < -palmNormalInertia){
+        else if (palmNorm < -palmNormalInertia && selectedImage != ''){
           recolour("scale"); 
           increaseSize();
           scaling = true;
@@ -293,6 +294,7 @@ var draw = function(){
   }
 
   function onPicture(x, y){
+    var result = false;
   //check if on cat picture
     $('img:not(.unmoveable)').each(function(){
       console.log('hey');
@@ -300,11 +302,13 @@ var draw = function(){
         // won't work once we bring rotation into the mix but for now it'll do...
         selectedImage = this.id;
         $(this).css({"border-color": "#67BCDB", "border-width":"2px", "border-style":"solid"});
+        result = true;
       } else {
         // we will need a better way of doing this as this will only work with one hand...
         $(this).css({"border-width":"0px"});
       }
     });
+    return result;
   }
 
   function onPicturePanel(x, y){
