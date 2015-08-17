@@ -1,84 +1,94 @@
 #hand0 {
-  position : absolute;
-  background-color : #939393;
-  width:30px;
-  height:30px;
-  border-radius:50px;
+  position: absolute;
+  background-color: #939393;
+  width: 30px;
+  height: 30px;
+  border-radius: 50px;
+  z-index: 999999;
 }
-
-.header{
-	margin-top: 0px;
-	padding: 0px;
-	background-color: #E6E6E6;
-	height : 50px;
+.header {
+  background-color: #3BCEAC;
+  padding-top: 10px;
+  height: 50px;
 }
-
-.header h3{
-	margin-top: 0px;
-	padding: 0px;
-	color: #000000;
-	text-align:right;
+.header h3 {
+  color: #000000;
+  text-align: right;
 }
-
+.header-image {
+  width: 100%;
+}
 .left {
-    width: 200px;
-    height: 90vh;
-    float: left;
-    left: 0px;
-    border-right: 2px #E6E6E6 solid;
-    overflow-y: scroll;
+  width: 200px;
+  height: 90vh;
+  float: left;
+  left: 0px;
+  overflow-y: scroll;
+  background-color: #ffffff;
 }
-
-.left div{
-	min-width: 150px;
+.left div {
+  margin-top:2px;
+  min-width: 150px;
   text-align: center;
   vertical-align: middle;
 }
-
-.left div img{
-    margin-top: 5px;
-    margin-bottom: 5px;
+.left div img {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
-
-.unmoveable{
-
-}
-
+.unmoveable {}
 .right {
-    white-space:nowrap;
-    overflow:hidden;
-    text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: right;
 }
-.header .instructions{
-  text-align:center;
+.header .instructions {
+  text-align: center;
   top: 10px;
   left: 20px;
   position: fixed;
   min-height: 30px;
   min-width: 70px;
-  color:#000000;
+  color: #000000;
   font-size: 20px;
+  z-index: 99999;
 }
-
-.instructions-panel{
+.instructions-panel {
   background-color: #67BCDB;
   font-family: 'Raleway';
   font-size: 20px;
   text-align: center;
-  color:#FFFFFF;
-  left:30%;
+  color: #FFFFFF;
+  margin-top: 3%;
+  left: 30%;
   width: 40%;
+  right: 30%;
   display: none;
   position: fixed;
+  z-index: 99999;
 }
-
-.instructions-panel h2{
-
+.instructions-panel h2 {
   font-size: 30px;
   text-align: center;
 }
-
-#output{
+#output {
   margin-right: 5px;
   margin-top: 5px;
+}
+
+.imagepanel {
+  float: left;
+  margin: 15% 15% 15% 15%;
+  white-space: normal;
+}
+body {
+  background-image: url("/assets/paper.jpg");
+}
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #888888;
+    margin: 1em 0;
+    padding: 0;
 }

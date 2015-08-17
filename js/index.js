@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(document).ready(function() {
 
   var image = new images();
   image.initialiseImages();
@@ -7,12 +7,8 @@ $(document).ready(function(){
   //this is really bad practice but uh fuck it
   $.when.apply(null, loaders).done(function() {
 
-    console.log('Finished loading images');
-
     image.addImages();
-
-    console.log('Added images to DOM');
-
+    
     // start doing stuff
     var d = new draw();
 

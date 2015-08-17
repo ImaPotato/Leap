@@ -1,77 +1,93 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- Meta-Information -->
-    <title>Leap</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Vendor: Bootstrap Stylesheets http://getbootstrap.com -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="http://js.leapmotion.com/leap-0.6.4.js"></script>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-  </head>
 
-  <body>
-    <div class = "header">
-        <h3 id="output"></h3>
-        <div class="pull-left instructions">instructions   <span class ="glyphicon glyphicon-question-sign"></span></div>
+<head>
+  <!-- Meta-Information -->
+  <title>Leap</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Vendor: Bootstrap Stylesheets http://getbootstrap.com -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://js.leapmotion.com/leap-0.6.4.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="css/index.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+  <div class="header">
+    <h3 id="output"></h3>
+    <div class="pull-left instructions">instructions
+      <span class="glyphicon glyphicon-question-sign"></span>
+    </div>
+  </div>
+
+  <div class="instructions-panel">
+    <h2>GESTURES</h2>
+    <div class="row">
+      <div class="col-sm-4">
+        <img src="assets/pinch.png" class="header-image">
+      </div>
+      <div class="col-sm-4">
+        <img src="assets/swipe.png" class="header-image">
+      </div>
+      <div class="col-sm-4">
+        <img src="assets/circle.png" class="header-image">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4">Selection - Pinch</div>
+      <div class="col-sm-4">Edit - Swipe</div>
+      <div class="col-sm-4">Rotation - Circle</div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <img src="assets/keytap.png" class="header-image">
+      </div>
+      <div class="col-sm-4">
+        <img src="assets/roll.png" class="header-image">
+      </div>
+      <div class="col-sm-4">
+        <img src="assets/pitch.png" class="header-image">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4"> Deselection - KeyTap</div>
+      <div class="col-sm-4"> Scaling - Roll</div>
+      <div class="col-sm-4"> Depth - Pitch</div>
+    </div>
+  </div>
+
+  <div>
+    <!-- these will be the users hands -->
+    <div id="panel" class="left">
+
     </div>
 
-<div class = "instructions-panel">
-               <h2>GESTURES</h2>
-            <div class = "row">
-                <div class = "col-sm-4"><img src="assets/pinch.png"></div>
-                <div class = "col-sm-4"><img src="assets/swipe.png"></div>
-                <div class = "col-sm-4"><img src="assets/circle.png"></div>
-            </div>
-            <div class = "row">
-                <div class = "col-sm-4">Selection - Pinch</div>
-                <div class = "col-sm-4">Edit - Swipe</div>
-                <div class = "col-sm-4">Rotation - Circle</div>
-  
-            </div>
-            <div class = "row">
-                <div class = "col-sm-4"><img src="assets/keytap.png"></div>
-                <div class = "col-sm-4"><img src="assets/roll.png"></div>
-                <div class = "col-sm-4"><img src="assets/pitch.png"></div>
-            </div>
-            <div class = "row">
-                <div class = "col-sm-4"> Deselection - KeyTap</div>
-                <div class = "col-sm-4"> Scaling - Roll</div>
-                <div class = "col-sm-4"> Depth - Pitch</div>
-            </div>
-            </div>
+    <div class="right">
+      <div id="hand0"></div>
+      <!-- logging -->
 
-    <div>
-        <!-- these will be the users hands -->
-        <div id="panel" class="left">
-            
-        </div>
-
-        <div class="right">
-            <div id="hand0"></div>
-
-            <!-- logging -->
-            
-            <!-- image panel -->
-            <div id="imagepanel"></div>
-        </div>
+      <!-- image panel -->
+      <div id="imagepanel" class="imagepanel"></div>
     </div>
-<script type="text/javascript">
-$(".instructions").click(function(){
-$(".instructions-panel").fadeToggle();
-});
-</script>
-    <script src="js/jqueryrotate.js"></script>
+  </div>
+  <script type="text/javascript">
+    $(".instructions").click(function() {
+      $(".instructions-panel").fadeToggle();
+    });
+  </script>
+  <script src="js/jqueryrotate.js"></script>
 
-    <script src="js/image.js"></script>
-    <script src="js/index.js"></script>
-    <script src="js/draw.js"></script>
-  </body>
+  <script src="js/image.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/draw.js"></script>
+</body>
+
 </html>

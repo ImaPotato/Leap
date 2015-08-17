@@ -1,15 +1,19 @@
-var draw = function(){
+var draw = function() {
 
   var selectedImage = '';
   //don't judge
   var imgcount = 10;
-  var x;
-  var y;
+
+  var x, y, selX, selY;
+
   var canMove = true; //true if selected image is able to move
   var canDrop = true; //true if selected image is able to be dropped
   var canMoveZ = false; //true when selected image can move forward or backward along z axis
   var canPinch = true;
-  var scaling = false; 
+  var scaling = false;
+
+  var maxSize = 800;
+  var minSize = 50;
 
   var moveReset; //reset timer for moving image after rotating
   var dropReset; //reset timer for dropping image after rotating
@@ -21,7 +25,7 @@ var draw = function(){
   var selectImages = [];
 
   function concatData(id, data) {
-      return id + ": " + data + "<br>";
+    return id + ": " + data + "<br>";
   }
 
   // renders each frame
@@ -31,100 +35,81 @@ var draw = function(){
     var hand = frame.hands;
 
     for (var i = 0; i < hand.length; i++) { //for each of the hands
-    
-      if(i == 1) break;
+
+      if (i == 1) break;
 
       var radius = 50; // create a circle for the finger
       var palmNormalInertia = 0.40; //threshold value for palm role angle at which to start scaling
       var palmPitchInertia = 0.75; //threshold value for palm pitch angle at which to start changing image depth forward
       var palmPitchInertia2 = -0.10; //threshold value for palm pitch angle at which to start changing image depth backward
-      
+
       var finger = hand[i].fingers[1]; //index finger
       var pos = finger.dipPosition;
       var palmNorm = hand[i].roll(); //palm roll normal value
       var palmPitch = hand[i].pitch(); //palm pitch normal value
 
-
-      //TESTING HAND PITCH TESTING HAND PITCH
-      //console.log(hand[i].pitch());
-
       //hand directly above Leap should be in middle of screen
-      x = $(window).width()/2 + pos[0]*6 ;
-      y = $(window).height() - pos[1]*3;
+      x = $(window).width() / 2 + pos[0] * 6;
+      y = $(window).height() - pos[1] * 3;
 
       //  update the cursor
       $("#hand" + i).css({
-        "position": "absolute", 
+        "position": "absolute",
         "top": y + "px",
         "left": x + "px",
       });
 
-      // lets do something really gross, if the x position of the cursor is less then 200px, we can assume that it's over the side panel 
-      if(x < 200){
+      // lets do something really gross, if the x position of the cursor is less then 200px, we can assume that it's over the side panel
+      if (x < 200) {
+        if (hand[i].pinchStrength > 0.9) {
 
-        // check if they're currently holding a picture, if they are place it
+          var id = onPicturePanel(x, y);
 
-        // see if they've attempted to select anything
-
-        if(hand[i].pinchStrength > 0.9){
-
-          var id = onPicturePanel(x, y); 
-
-          if(id != '' && canPinch){
+          if (id != '' && canPinch) {
 
             canPinch = false;
-            pinchReset = setTimeout(function(){canPinch = true}, 500);
+            pinchReset = setTimeout(function() {
+              canPinch = true
+            }, 500);
 
             var index = -1;
 
-            for (var z = 0; z < selectImages.length; z++){
-              if(selectImages[z] == id){
+            for (var z = 0; z < selectImages.length; z++) {
+              if (selectImages[z] == id) {
                 index = z;
               }
-            } 
-
-            if (index != -1){
-              selectImages.splice(index, z);
+            }
+            if (index != -1) {
+              $("#" + id).css({
+                "border-width": "0px"
+              });
+              selectImages.splice(index, 1);
             } else {
+              $("#" + id).css({
+                "border-color": "#67BCDB",
+                "border-width": "2px",
+                "border-style": "solid"
+              });
               selectImages.push(id);
             }
-
-            $('.unmoveable').each(function(){
-
-              var contains = false;
-
-              for (var z = 0; z < selectImages.length; z ++){
-                if (selectImages[z] == this.id){
-                  contains = true;
-                }
-              }
-
-              if (contains){
-                $(this).css({"border-color": "#67BCDB", "border-width":"2px", "border-style":"solid"});
-              } else {
-                $(this).css({"border-width":"0px"});
-              }
-            });
-
           }
-        } 
+        }
 
         // if they swipe right move all images onto the screen
-        if(frame.valid && frame.gestures.length > 0){
+        if (frame.valid && frame.gestures.length > 0) {
 
-          frame.gestures.forEach(function(gesture){
+          frame.gestures.forEach(function(gesture) {
 
             var handIds = gesture.handIds;
-            handIds.forEach(function(handId){
-              var hand = frame.hand(handId); //hand the gesture occured on        
+            handIds.forEach(function(handId) {
+              var hand = frame.hand(handId); //hand the gesture occured on
             });
 
-            switch (gesture.type){
+            switch (gesture.type) {
               case "swipe":
-                  onSwipe();
-                  console.log("Swipe Gesture");
-                  document.getElementById("output").innerHTML = "swipe gesture";
-                  break;
+                onSwipe();
+                document.getElementById("output").innerHTML = "swipe gesture";
+                break;
             }
           });
         }
@@ -132,129 +117,125 @@ var draw = function(){
       } else {
 
         // if we've selected an image move it to its new position
-
-        console.log(selectedImage);
-
-        if(selectedImage != '' && canMove == true){
-
-          console.log('please');
+        if (selectedImage != '' && canMove == true) {
 
           $('#' + selectedImage).css({
-            "position": "absolute", 
-            "top": y + "px",
-            "left": x + "px",
+            "position": "absolute",
+            "top": y - selY + "px",
+            "left": x - selX + "px",
           });
         }
 
         //select an image if user pinches on an image (and there is no image currently selected)
-        if(hand[i].pinchStrength > 0.9){
-          if(selectedImage == ''){
-            if(onPicture(x, y)){
+        if (hand[i].pinchStrength > 0.9) {
+          if (selectedImage == '') {
+            if (onPicture(x, y)) {
               recolour("select");
-            }       
-          } 
-        } 
+            }
+          }
+        }
 
-        if (palmNorm > palmNormalInertia && selectedImage != ''){
-          recolour("scale"); 
+        if (palmNorm > palmNormalInertia && selectedImage != '') {
+          recolour("scale");
           decreaseSize();
           scaling = true;
-        }  
-        else if (palmNorm < -palmNormalInertia && selectedImage != ''){
-          recolour("scale"); 
+        } else if (palmNorm < -palmNormalInertia && selectedImage != '') {
+          recolour("scale");
           increaseSize();
           scaling = true;
-        } 
-        else{
+        } else {
           scaling = false;
         }
 
         //adjust z-index of selected image depending on palm pitch
-        if(selectedImage != ''){
-          if(palmPitch < palmPitchInertia2){
-            if(!zDelayStarted){
+        if (selectedImage != '') {
+          if (palmPitch < palmPitchInertia2) {
+            if (!zDelayStarted) {
               zDelayStarted = true
               recolour("depth");
-              depthReset = setTimeout(function(){canMoveZ = true},1500);
+              depthReset = setTimeout(function() {
+                canMoveZ = true
+              }, 1500);
             }
-            if(canMoveZ){
+            if (canMoveZ) {
               moveBack();
-            } 
+            }
 
-          }   
-          else if (palmPitch > palmPitchInertia){
-            if(!zDelayStarted){
+          } else if (palmPitch > palmPitchInertia) {
+            if (!zDelayStarted) {
               zDelayStarted = true
               recolour("depth");
-              depthReset = setTimeout(function(){canMoveZ = true},1500);
+              depthReset = setTimeout(function() {
+                canMoveZ = true
+              }, 1500);
             }
-            if(canMoveZ){
+            if (canMoveZ) {
               moveForward();
-            }     
-          }
-          else{
+            }
+          } else {
             clearTimeout(depthReset);
             zDelayStarted = false;
-            if(canMove && !scaling){
+            if (canMove && !scaling) {
               recolour("select");
             }
           }
         }
 
         //If a gesture has been made by the user
-        if(frame.valid && frame.gestures.length > 0){
-
-          frame.gestures.forEach(function(gesture){
+        if (frame.valid && frame.gestures.length > 0) {
+          frame.gestures.forEach(function(gesture) {
 
             var handIds = gesture.handIds;
-            handIds.forEach(function(handId){
-              var hand = frame.hand(handId); //hand the gesture occured on        
+            handIds.forEach(function(handId) {
+              var hand = frame.hand(handId); //hand the gesture occured on
             });
 
-            switch (gesture.type){
+            switch (gesture.type) {
               case "circle":
-                  console.log("Circle Gesture");
-                  //rotate
-                  
-                  if(selectedImage != ''){
-                    canMove = false;
-                    canDrop = false;
-                    clearTimeout(moveReset);
-                    clearTimeout(dropReset);
-                    dropReset = setTimeout(function(){canDrop = true},400);
-                    moveReset = setTimeout(function(){canMove = true},1000);
+                //rotate
+                if (selectedImage != '') {
+                  canMove = false;
+                  canDrop = false;
+                  clearTimeout(moveReset);
+                  clearTimeout(dropReset);
+                  dropReset = setTimeout(function() {
+                    canDrop = true
+                  }, 400);
+                  moveReset = setTimeout(function() {
+                    canMove = true
+                  }, 1000);
 
-                    var clockwise = false;
-                    var pointableID = gesture.pointableIds[0];
-                    var direction = frame.pointable(pointableID).direction;
-                    var dotProduct = Leap.vec3.dot(direction, gesture.normal);
+                  var clockwise = false;
+                  var pointableID = gesture.pointableIds[0];
+                  var direction = frame.pointable(pointableID).direction;
+                  var dotProduct = Leap.vec3.dot(direction, gesture.normal);
 
-                    if (dotProduct  >  0) clockwise = true;
-                    recolour("rotate");
-                    if (!clockwise) rotateACW(); else rotateCW();
-                  }
-                  break;
+                  if (dotProduct > 0) clockwise = true;
+                  recolour("rotate");
+                  if (!clockwise) rotateACW();
+                  else rotateCW();
+                }
+                break;
               case "keyTap":
-                  // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
-                  if(selectedImage != '' && canDrop == true) {
-                    selectedImage = ''; 
-                    recolour("unselect");
-                  }
-                  break;
+                // this is pretty gross as well but if we've got something selected and we do this gesture we will put it back down again
+                if (selectedImage != '' && canDrop == true) {
+                  selectedImage = '';
+                  recolour("unselect");
+                  deselectAll();
+                }
+                break;
               case "screenTap":
-                     
-                  break;
+
+                break;
               case "swipe":
-                  onSwipe();
-                  console.log("Swipe Gesture");
-                  document.getElementById("output").innerHTML = "swipe gesture";
-                  break;
-                  
+                onSwipe();
+                document.getElementById("output").innerHTML = "swipe gesture";
+                break;
             }
           });
         }
       }
-    }     
+    }
 
     //printing some data
     var output = document.getElementById('output');
@@ -262,14 +243,12 @@ var draw = function(){
     frameString += concatData("num_hands", frame.hands.length);
     frameString += concatData("num_fingers", frame.fingers.length);
     frameString += "<br>";
-
-
   };
 
-  function onSwipe(){
-    if (selectImages.length != 0){
+  function onSwipe() {
+    if (selectImages.length != 0) {
 
-      for(var i = 0; i < selectImages.length; i++){
+      for (var i = 0; i < selectImages.length; i++) {
 
         var img = $('#' + selectImages[i]);
         var pan = $('#imagepanel');
@@ -278,44 +257,57 @@ var draw = function(){
 
         cln.removeClass("unmoveable");
 
-        cln.attr('id', "img-"+imgcount);
-        imgcount++; 
+        cln.attr('id', "img-" + imgcount);
+        imgcount++;
 
         pan.append(cln);
       }
 
       //deselect everything
       selectImages = [];
-      $('.unmoveable').each(function(){
-        $(this).css({"border-width":"0px"});
+
+      $('.unmoveable').each(function() {
+        $(this).css({
+          "border-width": "0px"
+        });
       });
+
+      deselectAll();
 
     }
   }
 
-  function onPicture(x, y){
+  function onPicture(x, y) {
     var result = false;
-  //check if on cat picture
-    $('img:not(.unmoveable)').each(function(){
-      console.log('hey');
-      if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
-        // won't work once we bring rotation into the mix but for now it'll do...
-        selectedImage = this.id;
-        $(this).css({"border-color": "#67BCDB", "border-width":"2px", "border-style":"solid"});
-        result = true;
-      } else {
-        // we will need a better way of doing this as this will only work with one hand...
-        $(this).css({"border-width":"0px"});
-      }
-    });
+
+    deselectAll();
+    //this isn't the fastest operation but means we can easily deal with rotated images.
+    var image = document.elementFromPoint(x, y);
+    if (image.nodeName.toLowerCase() === 'img') {
+      selectedImage = image.id;
+
+      var elemRect = image.getBoundingClientRect(),
+        offsetY = y - elemRect.top,
+        offsetX = x - elemRect.left;
+
+      selX = offsetX;
+      selY = offsetY;
+
+      $("#" + image.id).css({
+        "border-color": "#67BCDB",
+        "border-width": "2px",
+        "border-style": "solid"
+      });
+      result = true;
+    }
     return result;
   }
 
-  function onPicturePanel(x, y){
-  //check if on cat picture
+  function onPicturePanel(x, y) {
+    //check if on cat picture
     var img = '';
-    $('.unmoveable').each(function(){
-      if(x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height){
+    $('.unmoveable').each(function() {
+      if (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height) {
         // won't work once we bring rotation into the mix but for now it'll do...
         img = this.id;
       }
@@ -323,59 +315,84 @@ var draw = function(){
     return img;
   }
 
-  function increaseSize(){
-    $('#' + selectedImage).css({ "width": "+=" + $('#' + selectedImage).width() * .01, "height": "+=" + $('#' + selectedImage).height() * .01});
+  function increaseSize() {
+    if ($('#' + selectedImage).width() < maxSize && $('#' + selectedImage).height() < maxSize) {
+      $('#' + selectedImage).css({
+        "width": "+=" + $('#' + selectedImage).width() * .01,
+        "height": "+=" + $('#' + selectedImage).height() * .01
+      });
+
+      selX += selX * .01;
+      selY += selY * .01;
+    }
   }
-  function decreaseSize(){
-    $('#' + selectedImage).css({ "width": "-=" + $('#' + selectedImage).width() * .01, "height": "-=" + $('#' + selectedImage).height() * .01});
+
+  function decreaseSize() {
+    if ($('#' + selectedImage).width() > minSize && $('#' + selectedImage).height() > minSize) {
+      $('#' + selectedImage).css({
+        "width": "-=" + $('#' + selectedImage).width() * .01,
+        "height": "-=" + $('#' + selectedImage).height() * .01
+      });
+
+      selX -= selX * .01;
+      selY -= selY * .01;
+    }
   }
 
   //rotate image anti-clockwise
-  function rotateACW(){
+  function rotateACW() {
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
-    img.rotate(angle -0.2);
+    img.rotate(angle - 0.2);
   }
 
   //rotate image clockwise
-  function rotateCW(){
+  function rotateCW() {
     var img = $('#' + selectedImage);
     var angle = img.getRotateAngle();
-    img.rotate(angle -359.8);
+    img.rotate(angle - 359.8);
   }
 
-  function moveBack(){
+  function moveBack() {
     var initialZ = $('#' + selectedImage).css("z-index");
     $('#' + selectedImage).css({
       "z-index": (parseInt(initialZ) - 1).toString()
-    }); 
+    });
     canMoveZ = false;
     zDelayStarted = false;
     clearTimeout(depthReset);
   }
 
-  function moveForward(){
+  function moveForward() {
     var initialZ = $('#' + selectedImage).css("z-index");
     $('#' + selectedImage).css({
       "z-index": (parseInt(initialZ) + 1).toString()
-    }); 
+    });
     canMoveZ = false;
     zDelayStarted = false;
     clearTimeout(depthReset);
   }
 
-//recolour the header and change output text depending on the event
-   function recolour(event){
-     switch(event){
-       case "select":
-         document.getElementById("output").innerHTML = "Moving image";
-         $(".header").css("background-color", "#0099FF");
-         break;
- 
-       case "unselect":
+  function deselectAll() {
+    $('img:not(.unmoveable)').each(function() {
+      $(this).css({
+        "border-width": "0px"
+      });
+    });
+  }
+
+  //recolour the header and change output text depending on the event
+  function recolour(event) {
+    switch (event) {
+      case "select":
+        document.getElementById("output").innerHTML = "Moving image";
+        $(".header").css("background-color", "#0099FF");
+        break;
+
+      case "unselect":
         document.getElementById("output").innerHTML = "";
-         $(".header").css("background-color", "#E6E6E6");
-         break;
+        $(".header").css("background-color", "#3BCEAC");
+        break;
 
       case "depth":
         document.getElementById("output").innerHTML = "Changing depth. Current z: " + $('#' + selectedImage).css("z-index");
@@ -391,9 +408,11 @@ var draw = function(){
         document.getElementById("output").innerHTML = "Scaling";
         $(".header").css("background-color", "#CF537C");
         break;
-     }
+    }
   }
   // listen to Leap Motion
-  Leap.loop({enableGestures: true}, draw);
+  Leap.loop({
+    enableGestures: true
+  }, draw);
 
-} 
+}
