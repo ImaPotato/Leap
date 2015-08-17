@@ -4,7 +4,7 @@ var draw = function() {
   //don't judge
   var imgcount = 10;
 
-  var x, y, selX, selY;
+  var x, y, selX = 0, selY;
 
   var canMove = true; //true if selected image is able to move
   var canDrop = true; //true if selected image is able to be dropped
@@ -60,7 +60,7 @@ var draw = function() {
       });
 
       // lets do something really gross, if the x position of the cursor is less then 200px, we can assume that it's over the side panel
-      if (x < 200) {
+      if (x - selX < 200) {
         if (hand[i].pinchStrength > 0.9) {
 
           var id = onPicturePanel(x, y);
@@ -279,7 +279,8 @@ var draw = function() {
 
   function onPicture(x, y) {
     var result = false;
-
+    selX = 0;
+    selY = 0;
     deselectAll();
     //this isn't the fastest operation but means we can easily deal with rotated images.
     var image = document.elementFromPoint(x, y);

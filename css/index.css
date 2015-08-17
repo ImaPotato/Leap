@@ -10,6 +10,8 @@
   background-color: #3BCEAC;
   padding-top: 10px;
   height: 50px;
+  width: 100%
+  position: absolute;
 }
 .header h3 {
   color: #000000;
