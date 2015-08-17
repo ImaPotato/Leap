@@ -60,7 +60,7 @@ var draw = function() {
       });
 
       // lets do something really gross, if the x position of the cursor is less then 200px, we can assume that it's over the side panel
-      if (x - selX < 200) {
+      if (x - selX < 120) {
         if (hand[i].pinchStrength > 0.9) {
 
           var id = onPicturePanel(x, y);
