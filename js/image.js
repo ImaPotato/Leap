@@ -19,17 +19,17 @@ var images = function() {
   }
 
   this.initialiseImages = function() {
-    for (var i = 1; i < 8; i++) {
+    for (var i = 1; i < 6; i++) {
       loaders.push(loadImage('image/' + i + '.png'));
     }
   };
 
   this.addImages = function() {
-    for (var i = 0; i < 7; i++) {
+    for (var i = 1; i < 6; i++) {
       //this is also really bad...
       $('#panel').append(
         "<div>" +
-        "<img id=img-" + i + " src='" + imageArray[i].src + "' class='img-rounded unmoveable' style='height:128px;z-index:1'> " +
+        "<img id=img-" + i + " src='" + imageArray[i - 1].src + "' class='img-rounded unmoveable' style='height:82px;z-index:1'> " +
         "<hr>" +
         "</div>");
     }

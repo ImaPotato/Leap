@@ -258,6 +258,9 @@ var draw = function() {
         cln.removeClass("unmoveable");
 
         cln.attr('id', "img-" + imgcount);
+
+        cln.css({'height' : '128px'});
+
         imgcount++;
 
         pan.append(cln);
@@ -284,6 +287,7 @@ var draw = function() {
     deselectAll();
     //this isn't the fastest operation but means we can easily deal with rotated images.
     var image = document.elementFromPoint(x, y);
+    console.log(image);
     if (image.nodeName.toLowerCase() === 'img') {
       selectedImage = image.id;
 
