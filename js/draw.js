@@ -1,6 +1,7 @@
 var draw = function() {
 
   var selectedImage = '';
+  var selectedImage2 = '';
   //don't judge
   var imgcount = 10;
 
@@ -287,8 +288,7 @@ var draw = function() {
     deselectAll();
     //this isn't the fastest operation but means we can easily deal with rotated images.
     var image = document.elementFromPoint(x, y);
-    console.log(image);
-    if (image.nodeName.toLowerCase() === 'img') {
+    if (image.nodeName.toLowerCase() === 'img' && !$(image).hasClass("unmoveable")) {
       selectedImage = image.id;
 
       var elemRect = image.getBoundingClientRect(),
